@@ -170,6 +170,7 @@ namespace MILD
 	{
 		int feature_num = desc.rows;
 		matches.clear();
+		matches.reserve(feature_num);
 		std::vector<unsigned long> hash_entry_index = std::vector<unsigned long>(hash_table_num);
 		for (unsigned short feature_idx = 0; feature_idx < feature_num; feature_idx++)
 		{
@@ -205,14 +206,13 @@ namespace MILD
 					}
 				}
 			}
-			if (min_distance <= distance_threshold)
-			{
+
 				DMatch m;
 				m.queryIdx = feature_idx;
 				m.trainIdx = best_corr_fid;
 				m.distance = min_distance;
 				matches.push_back(m);
-			}
+
 
 		}
 		
@@ -244,6 +244,7 @@ namespace MILD
 	{
 		int feature_num = desc.rows;
 		matches.clear();
+		matches.reserve(feature_num);
 		for (unsigned short feature_idx = 0; feature_idx < feature_num; feature_idx++)
 		{
 			unsigned char *data = (unsigned char *)desc.data + feature_idx * 32;

@@ -259,9 +259,9 @@ int calculate_hamming_distance(uint64_t * f1, uint64_t * f2)
 
 void sparseMatch_ORB(cv::Mat d_ref, cv::Mat d_new, std::vector<cv::DMatch> &matches)
 {
-	MILD::SparseMatcher sparseMatcher(FEATURE_TYPE_ORB, 32, 0, HAMMING_DISTANCE_THRESHOLD);
+	MILD::SparseMatcher sparseMatcher(FEATURE_TYPE_ORB, 24, 0, HAMMING_DISTANCE_THRESHOLD);
 	sparseMatcher.train(d_new);
-	sparseMatcher.search_8(d_ref, matches);
+	sparseMatcher.search(d_ref, matches);
 }
 void BFMatch_ORB(cv::Mat d1, cv::Mat d2, std::vector<cv::DMatch> &matches)
 {
@@ -784,10 +784,10 @@ void frame_match(Frame &frame_ref, Frame &frame_new, const cv::Mat K, MonoFrameC
 	std::vector<cv::DMatch> matches_ref_to_new, matches_new_to_ref;
 	true_matches.reserve(frame_ref.descriptor.rows);
 
+	cout << "input feature : " << frame_ref.descriptor.rows << " " << frame_new.descriptor.rows << endl;
 	start = clock();
 
 	// use brute force match
-	cout << "input feature : " << frame_ref.descriptor.rows << " " << frame_new.descriptor.rows << endl;
 	if(	sc.use_sparse_match)
 	{
 		// use sparse match
@@ -805,6 +805,7 @@ void frame_match(Frame &frame_ref, Frame &frame_new, const cv::Mat K, MonoFrameC
 		BFMatch_ORB(frame_new.descriptor, frame_ref.descriptor, matches_new_to_ref);
 	}
 
+	end = clock();
 	for (int i = 0; i < matches_ref_to_new.size(); i++)
 	{
 		if (matches_ref_to_new[i].queryIdx == matches_new_to_ref[matches_ref_to_new[i].trainIdx].trainIdx)
@@ -815,9 +816,8 @@ void frame_match(Frame &frame_ref, Frame &frame_new, const cv::Mat K, MonoFrameC
 			}
 		}
 	}
-
 	cout << "match over " << true_matches.size()  << endl;
-	end = clock();
+
 	float time_match = (end - start)/ (double) CLOCKS_PER_SEC;
 	start = clock();
 	cv::Mat img_matches;
